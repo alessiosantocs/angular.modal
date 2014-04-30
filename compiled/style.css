@@ -1,0 +1,237 @@
+.back_overlay {
+  background-color: transparent;
+  display: block;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 1000%;
+  width: 100%;
+  z-index: 99999999;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+}
+.back_overlay.enter {
+  top: 0%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.back_overlay .closer_overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 21;
+}
+.back_overlay .window {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 97%;
+  position: relative;
+  z-index: 22;
+  margin: auto;
+}
+.back_overlay .window.medium_size .news_card_title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0.5em 0em;
+  color: #467daa;
+  line-height: 1.25em;
+  margin-bottom: 1em;
+}
+.back_overlay .window.medium_size button.button_warning {
+  width: 100%;
+  margin-bottom: 1em;
+}
+.back_overlay .window h3.welcomedoc {
+  background: url(/assets/bluesteto.png) no-repeat center left;
+  width: 462px;
+  margin: 0 auto;
+}
+.back_overlay .window.adaptive_font {
+  font-size: 0.8em;
+}
+@media (min-width: 842px) {
+  .back_overlay .window.adaptive_font {
+    font-size: 1em;
+  }
+}
+@media (min-width: 842px) {
+  .back_overlay .window {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+  .back_overlay .window.small_size {
+    width: 400px;
+    font-size: 1em;
+  }
+  .back_overlay .window.medium_size {
+    width: 400px;
+    font-size: 1em;
+  }
+  .back_overlay .window.bigger_medium_size {
+    width: 430px;
+    font-size: 1em;
+  }
+  .back_overlay .window.smaller_large_size {
+    width: 530px;
+    font-size: 1em;
+  }
+  .back_overlay .window.large_size {
+    width: 690px;
+    font-size: 1em;
+  }
+  .back_overlay .window.over_size {
+    width: 800px;
+    font-size: 1em;
+  }
+  .back_overlay .window.size_1080 {
+    width: 1080px;
+    font-size: 1em;
+  }
+  .back_overlay .window.grid_layout {
+    width: 890px;
+  }
+  .back_overlay .window.grid_layout .close_popup_x {
+    top: 130px;
+  }
+  .back_overlay .window.grid_layout .content {
+    padding: 3em;
+  }
+  .back_overlay .window.grid_layout .content .centered {
+    padding: 30px 20px;
+  }
+  .back_overlay .window.grid_layout .content .centered .list_form {
+    padding-left: 63px;
+    background: url(/assets/mail_icon.png) no-repeat 0px 4px;
+  }
+  .back_overlay .window.grid_layout .content .centered.success {
+    padding: 20px;
+    padding-left: 80px;
+    background: url(/assets/mail_icon.png) no-repeat 15px 21px;
+  }
+}
+.back_overlay .window .content {
+  padding: 1em;
+  background: #fff;
+  border-radius: 0.3em;
+  position: relative;
+}
+.back_overlay .window .content header, .back_overlay .window .content footer {
+  background: #f7f7f7;
+  border-bottom: 1px solid #e7e7e7;
+  border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+}
+.back_overlay .window .content header h2, .back_overlay .window .content footer h2 {
+  margin: 0;
+}
+.back_overlay .window .content header .close, .back_overlay .window .content footer .close {
+  position: absolute;
+  right: 1em;
+  top: 0.8em;
+  font-size: 2em;
+  width: 20px;
+  height: 20px;
+  display: block;
+  cursor: pointer;
+}
+.back_overlay .window .content footer {
+  border: none;
+  border-top: 1px solid #e7e7e7;
+  border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  -webkit-border-radius: 0 0 5px 5px;
+}
+.back_overlay .window .content section, .back_overlay .window .content header, .back_overlay .window .content footer {
+  padding: 15px;
+  z-index: 200;
+}
+.back_overlay .window .content form.for_blinds {
+  width: 100%;
+  margin-top: 1.5em;
+}
+.back_overlay .window .content form.for_blinds.in_the_middle {
+  margin-top: 0;
+}
+.back_overlay .window .content form.for_blinds.signupform {
+  width: 326px !important;
+}
+.back_overlay .window .content form.for_blinds input {
+  width: 100%;
+  font-size: 1em;
+  border: 1px solid #D8D8D8;
+  margin-bottom: 0.75em;
+  color: #444;
+  padding: 0.75em;
+}
+.back_overlay .window .content form.for_blinds input#user_remember_me {
+  float: left;
+  width: 13px;
+}
+.back_overlay .window .content form.for_blinds label#forgottenpwd {
+  float: left;
+  width: 13px;
+}
+.back_overlay .window .content form.for_blinds label.rememberme {
+  padding-top: 0;
+}
+.back_overlay .window .content form.for_blinds button.button_xlarge {
+  margin-top: 0.25em;
+}
+.back_overlay .window .content form.for_blinds .forgottenpwd, .back_overlay .window .content form.for_blinds .complete_reg {
+  font-size: 12px;
+  font-weight: normal;
+}
+.back_overlay .window .content form.for_blinds .forgottenpwd a, .back_overlay .window .content form.for_blinds .complete_reg a {
+  color: #467daa;
+}
+.back_overlay .window .content form.for_blinds .complete_reg {
+  font-size: 18px;
+  height: 40px;
+  margin-top: 18px !important;
+}
+.back_overlay .window .content .content_subtitle {
+  font-weight: 400;
+}
+.back_overlay .window .content form.signup ul.p_autocomplete {
+  height: auto;
+  line-height: normal;
+  width: 100%;
+  font-size: 1em;
+  border-radius: 3px;
+  border: 1px solid #BDBDBD;
+  color: #444;
+  padding: 0;
+  overflow: visible;
+  background: white;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 0.75em;
+}
+.back_overlay .window .content form.signup ul.p_autocomplete li.dropdown input {
+  margin-bottom: 0 !important;
+  border: 0 !important;
+}
+.back_overlay .window .content .formbody {
+  margin-top: 1.5em;
+}
+.back_overlay .window .content .checkbox-accept {
+  width: 13px !important;
+  padding: 0 !important;
+  margin: 0;
+  position: relative;
+  top: 2px;
+}
+
+body.poppedup, body.overflowhidden {
+  overflow: hidden !important;
+}
+
+.back_overlay.freeship img {
+  max-width: 100%;
+}
+.back_overlay.freeship .window.bigger_medium_size {
+  width: 510px;
+}

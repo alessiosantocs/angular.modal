@@ -1,17 +1,33 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="compiled/style.css">
 
+	<title>Example of modals</title>
 
-<div modalize="hangout.tutorial.1">
-	<modalize window-class="small_size" content-class="custom-class">
-		<a href="#" ng-click="$modal.open('hangout.tutorial.2')">
-			Start
-		</a>
-	</modalize>
-</div>  
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.js"></script>
+	<script type="text/javascript" src="compiled/angular.modal.js"></script>
 
-<div modalize="hangout.tutorial.2">
-	<modalize window-class="over_size" content-class="custom-class">
-		<img src="/assets/istruzioni_videoaudio.png" width="100%">
-	</modalize>
-</div>  
+	<script type="text/javascript" src="main.js"></script>
+</head>
+<body ng-app="modalExample">
 
+	<a href="#" ng-click="$modal.open('custom.id');">Open up</a>
+
+	<div modalize="custom.id">
+		<modalize window-class="small_size" content-class="custom-class">
+			<a href="#" ng-click="$modal.open('whatever.second')">
+				Start
+			</a>
+		</modalize>
+	</div>  
+
+	<div modalize="whatever.second">
+		<modalize window-class="over_size" content-class="custom-class">
+			<img src="/assets/istruzioni_videoaudio.png" width="100%">
+		</modalize>
+	</div>  
+
+</body>
+</html>
 
