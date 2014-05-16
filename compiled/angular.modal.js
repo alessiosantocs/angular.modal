@@ -1,8 +1,30 @@
 var modal;
 
-modal = angular.module('angular.modal', []).provider('$modal', [
+modal = angular.module('angular.modal', []).provider('$modalTemplates', [
   function() {
-    var available_modals, config, generateId, manipulateDom, popup_statuses;
+    var available_templates;
+    available_templates = {
+      "default": "<div adapt-to-parent='centered'> <div class='closer_overlay' ng-click='$modal.closeAll()' ng-show='closable || true'></div> <div class='window' ng-class='windowClass'> <div  style='font-size: 2em;position: absolute;right: 0.5em;z-index: 1;cursor:pointer' ng-click='$modal.closeAll()' class='close_popup_x' ng-show='closable || true'> &times; </div> <div  class='content' ng-class='contentClass' ng-init='in_popup = true; data = popup.message' ng-transclude> </div> </div> </div>"
+    };
+    this.current_template = 'default';
+    this.getTemplate = function(id) {
+      return available_templates[id];
+    };
+    this.push = function(id, template) {
+      return available_templates[id] = template;
+    };
+    this.$get = [
+      '$timeout', function($timeout) {
+        return this;
+      }
+    ];
+    return this;
+  }
+]);
+
+modal.provider('$modal', [
+  '$modalTemplatesProvider', function($modalTemplatesProvider) {
+    var ModalEventHandler, available_events, available_modals, config, eventHandler, generateId, manipulateDom, popup_statuses;
     popup_statuses = {
       visible: "active",
       hidden: "hidden"
@@ -13,18 +35,23 @@ modal = angular.module('angular.modal', []).provider('$modal', [
       dom_active_class: "active"
     };
     available_modals = {};
+    this.current_template = function() {
+      return $modalTemplatesProvider.getTemplate($modalTemplatesProvider.current_template);
+    };
     generateId = function(elm) {
-      var date, id, milli, stamp;
+      var date, id, milli, rand, stamp;
       date = new Date();
       milli = date.getMilliseconds();
-      stamp = "" + (date.valueOf()) + milli;
+      rand = Math.random().toString().replace("0.", "");
+      stamp = "" + (date.valueOf()) + milli + rand;
       id = "" + config.dom_id_prefix + stamp + milli;
       elm.attr('id', id);
       return id;
     };
     manipulateDom = function(popup) {
-      var elm;
-      elm = angular.element("#" + popup.elm_id);
+      var elm, raw;
+      raw = document.getElementById(popup.elm_id);
+      elm = angular.element(raw);
       elm.addClass(config.dom_class);
       if (popup.status === popup_statuses.active) {
         return elm.addClass(config.dom_active_class);
@@ -44,6 +71,12 @@ modal = angular.module('angular.modal', []).provider('$modal', [
         available_modals[popup.id].status = popup_statuses.hidden;
         return manipulateDom(available_modals[popup.id]);
       } else if (popup.type === "link") {
+        available_modals[popup.id] = {};
+        available_modals[popup.id].type = popup.type;
+        available_modals[popup.id].id = popup.id;
+        available_modals[popup.id].elm_id = generateId(popup.elm);
+        available_modals[popup.id].status = popup_statuses.hidden;
+        manipulateDom(available_modals[popup.id]);
         return alert("fill here");
       }
     };
@@ -53,6 +86,34 @@ modal = angular.module('angular.modal', []).provider('$modal', [
     this.configGet = function(property) {
       return config[property];
     };
+    available_events = {
+      modalWillAppear: "modalWillAppear",
+      modalDidAppear: "modalDidAppear",
+      modalWillDisappear: "modalWillDisappear",
+      modalDidDisappear: "modalDidDisappear"
+    };
+    ModalEventHandler = function() {
+      var registered_events;
+      registered_events = {};
+      this.register = function(event, callback) {
+        if (!(registered_events[event] instanceof Array)) {
+          registered_events[event] = [];
+        }
+        registered_events[event].push(callback);
+        return true;
+      };
+      return this.call = function(event) {
+        var callback, callbacks, _i, _len;
+        if (callbacks = registered_events[event]) {
+          for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+            callback = callbacks[_i];
+            callback();
+          }
+        }
+        return true;
+      };
+    };
+    eventHandler = new ModalEventHandler();
     this.$get = [
       '$timeout', function($timeout) {
         this.closeAll = function() {
@@ -87,12 +148,41 @@ modal.directive("modalize", [
     return {
       restrict: "A",
       link: function(scope, elm, attr) {
-        var modal_id;
+        var modal_id, type;
         modal_id = attr.modalize;
+        type = "html";
         console.log(modal_id);
         console.log(elm);
         $modal.push({
-          type: "html",
+          type: type,
+          id: modal_id,
+          elm: elm
+        });
+        return true;
+      }
+    };
+  }
+]);
+
+modal.directive("modalizeD", [
+  '$modal', function($modal) {
+    return {
+      restrict: "A",
+      scope: {
+        src: "@"
+      },
+      template: "<div ng-include='src'></div>",
+      link: function(scope, elm, attr) {
+        var modal_id, type;
+        modal_id = attr.modalizeD;
+        type = "html";
+        if (attr.src != null) {
+          type = "link";
+        }
+        console.log(modal_id);
+        console.log(elm);
+        $modal.push({
+          type: type,
           id: modal_id,
           elm: elm
         });
@@ -108,7 +198,9 @@ modal.directive("modalize", [
       restrict: "E",
       scope: {
         windowClass: "@",
-        contentClass: "@"
+        contentClass: "@",
+        closable: "@",
+        centered: "@"
       },
       replace: true,
       transclude: true,
@@ -117,15 +209,43 @@ modal.directive("modalize", [
           return $scope.$modal = $modal;
         }
       ],
-      template: "<div> <div class='closer_overlay' ng-click='$modal.closeAll()'></div> <div class='window' ng-class='windowClass'> <div  style='font-size: 2em;position: absolute;right: 0.5em;z-index: 1;cursor:pointer' ng-click='$modal.closeAll()' class='close_popup_x'> &times; </div> <div  class='content' ng-class='popup.container_class' ng-init='in_popup = true; data = popup.message' ng-transclude> </div> </div> </div>"
+      template: $modal.current_template()
+    };
+  }
+]);
+
+modal.directive("adaptToParent", [
+  '$timeout', function($timeout) {
+    return {
+      restrict: "A",
+      link: function(scope, elm, attr) {
+        var time;
+        time = window.setInterval(function() {
+          var height, parent, width;
+          if (scope.centered !== "false") {
+            elm.css("display", "table-cell");
+            elm.css("vertical-align", "middle");
+            parent = elm.offsetParent();
+            height = parent.height();
+            width = parent.width();
+            elm.height(height);
+            return elm.width(width);
+          } else {
+            console.log("Clear interval");
+            return window.clearInterval(time);
+          }
+        }, 100);
+        return true;
+      }
     };
   }
 ]);
 
 modal.run([
-  '$modal', '$rootScope', function($modal, $rootScope) {
+  '$modal', '$modalTemplates', '$rootScope', function($modal, $modalTemplates, $rootScope) {
     if ($modal.configGet('inject_into_html')) {
-      return $rootScope.$modal = $modal;
+      $rootScope.$modal = $modal;
+      return window.$modal = $modal;
     }
   }
 ]);
