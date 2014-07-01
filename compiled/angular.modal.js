@@ -174,6 +174,10 @@ modal.directive("modalizeD", [
       template: "<div ng-include='src'></div>",
       link: function(scope, elm, attr) {
         var modal_id, type;
+        scope.binding = scope.$parent;
+        if ($modal.configGet('inject_into_html')) {
+          scope.$modal = $modal;
+        }
         modal_id = attr.modalizeD;
         type = "html";
         if (attr.src != null) {
