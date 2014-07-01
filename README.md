@@ -45,7 +45,7 @@ As per configuration in the example:
 This is the basic you'll have to know to get started. Read further to learn more.
 
 ##Getting dirty - Api reference
-###<modalize> attributes:
+###&lt;modalize&gt; attributes:
 A partial of the default modal structure. It'll help you go faster!
 
 	windowClass:	Adds a class to window container of the default structure [default=window]
