@@ -79,7 +79,7 @@ You can write your code into your partial as you've been doing before:
      </a>
 </modalize>
 ```
-A common problem is that you'll want to get some parent scope variable inside this dynamic modal. No worries just use _binding_. Let's have a look at a great example by @andreapaciolla:
+A common problem is that you'll want to get some parent scope variable inside this dynamic modal. No worries just use _binding_. Let's have a look at a great example by [@andreapaciolla](https://github.com/andreapaciolla):
 ```
 <div ng-controller="SampleCtrl">
     <div modalize-d="blog.post.read.more" src="/templates/poppy"></div>
