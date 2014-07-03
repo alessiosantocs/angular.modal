@@ -1,0 +1,31 @@
+{
+  "name": "angular.modal",
+  "version": "1.0.0",
+  "homepage": "https://github.com/alessiosantocs/angular.modal",
+  "authors": [
+    "Alessio Santo <alessiosantocs@gmail.com>",
+    "Andrea Paciolla <andreapaciolla@gmail.com>"
+  ],
+  "description": "A nice standalone modal system in Angularjs",
+  "main": "main.js",
+  "keywords": [
+    "angularjs",
+    "modal",
+    "angular",
+    "popup"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "example.html",
+    "src",
+    "README.md"
+  ],
+  "dependencies": {
+    "angular": "~1.0.6"
+  }
+}
