@@ -1,0 +1,27 @@
+{
+  "name": "angular.modal",
+  "version": "1.0.0",
+  "homepage": "https://github.com/AndreaPaciolla/angular.modal",
+  "authors": [
+    "Andrea Paciolla <andreapaciolla@gmail.com>"
+  ],
+  "description": "A nice standalone modal system in Angularjs",
+  "main": "main.js",
+  "keywords": [
+    "angularjs",
+    "modal",
+    "angular",
+    "popup"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.0.6"
+  }
+}
