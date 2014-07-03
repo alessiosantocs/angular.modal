@@ -19,7 +19,10 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "example.html",
+    "src",
+    "README.md"
   ],
   "dependencies": {
     "angular": "~1.0.6"
