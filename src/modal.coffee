@@ -233,6 +233,13 @@ modal.directive("modalizeD", ['$modal', ($modal)->
 	template: "<div ng-include='src'></div>"
 	link: (scope, elm, attr)->
 
+		# LET NG-INCLUDE TO INHERIT THE PARENT SCOPE
+		# USE AS $scope.binding TO REFER TO PARENT OBJECT
+		scope.binding = scope.$parent
+
+		# NG-INCLUDE DOES NOT INHERIT THE $rootScope SO WE'LL INJECT IT MANUALLY
+		if $modal.configGet('inject_into_html') then scope.$modal = $modal
+
 		modal_id = attr.modalizeD
 		type = "html"
 
