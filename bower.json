@@ -1,10 +1,10 @@
 {
   "name": "angular.modal",
   "version": "1.0.0",
-  "homepage": "https://github.com/AndreaPaciolla/angular.modal",
+  "homepage": "https://github.com/alessiosantocs/angular.modal",
   "authors": [
-    "Andrea Paciolla <andreapaciolla@gmail.com>",
-    "Alessio Santo <alessiosantocs@gmail.com>"
+    "Alessio Santo <alessiosantocs@gmail.com>",
+    "Andrea Paciolla <andreapaciolla@gmail.com>"
   ],
   "description": "A nice standalone modal system in Angularjs",
   "main": "main.js",
