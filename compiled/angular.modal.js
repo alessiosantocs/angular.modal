@@ -225,11 +225,19 @@ modal.directive("adaptToParent", [
           if (scope.centered !== "false") {
             elm.css("display", "table-cell");
             elm.css("vertical-align", "middle");
-            parent = elm.offsetParent();
-            height = parent.height();
-            width = parent.width();
-            elm.height(height);
-            return elm.width(width);
+            if (window.jQuery) {
+              parent = elm.offsetParent();
+              height = parent.height();
+              width = parent.width();
+              elm.height(height);
+              return elm.width(width);
+            } else {
+              parent = elm.parent()[0];
+              height = parent.offsetHeight;
+              width = parent.offsetWidth;
+              elm[0].style.height = height;
+              return elm[0].style.width = width;
+            }
           } else {
             console.log("Clear interval");
             return window.clearInterval(time);

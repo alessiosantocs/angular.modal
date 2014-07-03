@@ -274,12 +274,20 @@ modal.directive("adaptToParent", ['$timeout', ($timeout)->
 				elm.css "display", "table-cell"
 				elm.css "vertical-align", "middle"
 
-				parent = elm.offsetParent()
-				height = parent.height()
-				width  = parent.width()
+				if window.jQuery
+					parent = elm.offsetParent()
+					height = parent.height()
+					width  = parent.width()
 
-				elm.height height
-				elm.width width
+					elm.height height
+					elm.width width
+				else
+					parent = elm.parent()[0]
+					height = parent.offsetHeight
+					width  = parent.offsetWidth
+
+					elm[0].style.height = height
+					elm[0].style.width = width
 			else
 				console.log "Clear interval"
 				window.clearInterval time
