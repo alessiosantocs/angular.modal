@@ -14,16 +14,21 @@
 	<a href="#" ng-click="$modal.open('custom.id');">Open up</a>
 
 	<div modalize="custom.id">
-		<modalize window-class="small_size" content-class="custom-class">
+		<modalize window-class="small_size" content-class="custom-class" closable="false" centered="false">
+			<h1>This is a non-closable not-centered popup</h1>
+
 			<a href="#" ng-click="$modal.open('whatever.second')">
-				Start
+				Open another one
 			</a>
 		</modalize>
 	</div>  
 
+	<!-- A secon popup with basic configuration -->
 	<div modalize="whatever.second">
-		<modalize window-class="over_size" content-class="custom-class">
-			<img src="/assets/istruzioni_videoaudio.png" width="100%">
+		<modalize window-class="large_size" content-class="custom-class">
+			<h1>This is a closable centered popup</h1>
+			<h2>Click on the cat to close too!</h2>
+			<img src="http://gemgon.com/Octocat/img/octocat_outside.png" width="100%" ng-click="$modal.closeAll()">
 		</modalize>
 	</div>  
 

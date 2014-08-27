@@ -125,7 +125,7 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 			available_modals[popup.id].status 	= popup_statuses.hidden
 
 			manipulateDom(available_modals[popup.id])
-			alert "fill here"
+			#alert "fill here"
 
 	#  ============================================================================
 
@@ -181,24 +181,26 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 				modal.status = popup_statuses.hidden
 				manipulateDom(modal)
 
-
 		@open = (id)->
 			@closeAll()
 
 			# eventHandler.call available_events.modalWillAppear
 
-			$timeout(-> 
-				# alert id
-				console.log "=============================="
-				console.log available_modals
+			$timeout(->
 
-
-				available_modals[id].status = popup_statuses.active
-				manipulateDom(available_modals[id])
+				if available_modals[id] == undefined
+					console.warn "Angular.modal: There is no popup with id #{id}"
+				else
+					available_modals[id].status = popup_statuses.active
+					manipulateDom(available_modals[id])
 
 				# eventHandler.call available_events.modalDidAppear
 				
 			, 300)
+
+		# $modal.isOpened(<modal_id>) => true/false if the modal with the given id is/isn't opened
+		@isOpened = (id)->
+			available_modals[id].status == popup_statuses.active unless available_modals[id] == undefined
 
 		# @on = (event, callback)-> eventHandler.register(event, callback)
 
@@ -210,6 +212,7 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 
 
 # + The directive to register a modal - Data stuff
+# 	Register a normal inline modal through HTML
 modal.directive("modalize", ['$modal', ($modal)->
 	restrict: "A"
 	link: (scope, elm, attr)->
@@ -226,27 +229,39 @@ modal.directive("modalize", ['$modal', ($modal)->
 ])
 
 # + The directive to register a modal - Data stuff
+# 	Register a dynamic modal through HTML declaration
 modal.directive("modalizeD", ['$modal', ($modal)->
 	restrict: "A"
 	scope:
 		src: "@"
-	template: "<div ng-include='src'></div>"
+		# binding: "="
+	# This way we can load modals only when needed
+	template: "<div ng-include='modalSource(src)'></div>"
 	link: (scope, elm, attr)->
-
+		
+		# Get the given modal_id
+		modal_id = attr.modalizeD
+		
 		# LET NG-INCLUDE TO INHERIT THE PARENT SCOPE
-		# USE AS $scope.binding TO REFER TO PARENT OBJECT
 		scope.binding = scope.$parent
 
 		# NG-INCLUDE DOES NOT INHERIT THE $rootScope SO WE'LL INJECT IT MANUALLY
 		if $modal.configGet('inject_into_html') then scope.$modal = $modal
 
-		modal_id = attr.modalizeD
+		fullyLoaded = false
+		# Returns the source given in input only if the popup is opened
+		scope.modalSource = (src)->
+			# If the modal is opened or it has been already fullyLoaded
+			if $modal.isOpened(modal_id) or fullyLoaded
+				fullyLoaded = true
+				src
+			else
+				null
+
 		type = "html"
 
 		if attr.src?
 			type = "link"
-		console.log modal_id
-		console.log elm
 
 		$modal.push({type: type, id: modal_id, elm: elm})
 
@@ -254,6 +269,7 @@ modal.directive("modalizeD", ['$modal', ($modal)->
 ])
 
 # + The directive to generate the basic layout of a modal - Graphic stuff
+# 	It helps devs to have a repeatable pattern when building a modal.
 modal.directive("modalize", ['$modal', ($modal)->
 	restrict: "E"
 	scope: 
@@ -271,10 +287,10 @@ modal.directive("modalize", ['$modal', ($modal)->
 ])
 
 # + Adapt to the parent container
+# 	This is an utility directive created just for this occasion. It makes some div adapt and position to its parent.
 modal.directive("adaptToParent", ['$timeout', ($timeout)->
 	restrict: "A"
 	link: (scope, elm, attr)->
-
 
 		time = window.setInterval(->
 			if scope.centered != "false"
@@ -306,6 +322,7 @@ modal.directive("adaptToParent", ['$timeout', ($timeout)->
 
 
 
+# Default configuration of the module
 modal.run(['$modal', '$modalTemplates', '$rootScope', ($modal, $modalTemplates, $rootScope)->
 
 	if $modal.configGet('inject_into_html')

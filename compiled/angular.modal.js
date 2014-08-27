@@ -76,8 +76,7 @@ modal.provider('$modal', [
         available_modals[popup.id].id = popup.id;
         available_modals[popup.id].elm_id = generateId(popup.elm);
         available_modals[popup.id].status = popup_statuses.hidden;
-        manipulateDom(available_modals[popup.id]);
-        return alert("fill here");
+        return manipulateDom(available_modals[popup.id]);
       }
     };
     this.configSet = function(property, value) {
@@ -130,11 +129,18 @@ modal.provider('$modal', [
         this.open = function(id) {
           this.closeAll();
           return $timeout(function() {
-            console.log("==============================");
-            console.log(available_modals);
-            available_modals[id].status = popup_statuses.active;
-            return manipulateDom(available_modals[id]);
+            if (available_modals[id] === void 0) {
+              return console.warn("Angular.modal: There is no popup with id " + id);
+            } else {
+              available_modals[id].status = popup_statuses.active;
+              return manipulateDom(available_modals[id]);
+            }
           }, 300);
+        };
+        this.isOpened = function(id) {
+          if (available_modals[id] !== void 0) {
+            return available_modals[id].status === popup_statuses.active;
+          }
         };
         return this;
       }
@@ -171,20 +177,27 @@ modal.directive("modalizeD", [
       scope: {
         src: "@"
       },
-      template: "<div ng-include='src'></div>",
+      template: "<div ng-include='modalSource(src)'></div>",
       link: function(scope, elm, attr) {
-        var modal_id, type;
+        var fullyLoaded, modal_id, type;
+        modal_id = attr.modalizeD;
         scope.binding = scope.$parent;
         if ($modal.configGet('inject_into_html')) {
           scope.$modal = $modal;
         }
-        modal_id = attr.modalizeD;
+        fullyLoaded = false;
+        scope.modalSource = function(src) {
+          if ($modal.isOpened(modal_id) || fullyLoaded) {
+            fullyLoaded = true;
+            return src;
+          } else {
+            return null;
+          }
+        };
         type = "html";
         if (attr.src != null) {
           type = "link";
         }
-        console.log(modal_id);
-        console.log(elm);
         $modal.push({
           type: type,
           id: modal_id,
