@@ -6,23 +6,23 @@ modal = angular.module('angular.modal', []).provider('$modalTemplates', [->
 	available_templates = {
 		default: "
 			<div adapt-to-parent='centered'>
-			    <div class='closer_overlay' 
-			    	 ng-click='$modal.closeAll()'
-			    	 ng-show='closable || true'></div>
-			    <div class='window' ng-class='windowClass'>
-			      <div  style='font-size: 2em;position: absolute;right: 0.5em;z-index: 1;cursor:pointer' 
-			      		ng-click='$modal.closeAll()' 
-			      		class='close_popup_x'
-			      		ng-show='closable || true'>
-			      	&times;
-			      </div>
-			      <div  class='content' 
+				<div class='closer_overlay' 
+					ng-click='$modal.closeAll()'
+					ng-show='closable || true'></div>
+				<div class='window' ng-class='windowClass'>
+					<div  style='font-size: 2em;position: absolute;right: 0.5em;z-index: 1;cursor:pointer' 
+						ng-click='$modal.closeAll()' 
+						class='close_popup_x'
+						ng-show='closable || true'>
+						&times;
+					</div>
+					<div  class='content' 
 						ng-class='contentClass' 
 						ng-init='in_popup = true; data = popup.message'
 						ng-transclude>
-			      </div>
-			    </div>
-			  </div>
+					</div>
+				</div>
+			</div>
 			"
 	}
 
