@@ -1,7 +1,91 @@
 
-# The provider to save templates
 
-modal = angular.module('angular.modal', []).provider('$modalTemplates', [->
+# Angular modal ===============
+angular_modal_module_name = "angular.modal" # Who knows, maybe you want to change the name of the module
+
+
+# AModal Class ======================================================
+
+class AModal
+
+	# PRIVATE METHODS AND PROPERTIES ================================
+
+	# Let's have some predefined constants
+	constants =
+		popup_statuses:
+			visible: "active"
+			hidden: "hidden"
+
+	# - Manage the dom related stuff of the element
+	manipulateDom = (popup)->
+		raw = popup.elm
+		elm = angular.element(raw) # Wrap into an jqlite object
+
+		elm.addClass popup.config.dom_class
+
+		if popup.status == constants.popup_statuses.active
+			elm.addClass popup.config.dom_active_class
+		else
+			elm.removeClass popup.config.dom_active_class
+
+
+	# PUBLIC METHODS AND PROPERTIES =================================
+
+
+	# + Constructor method: # => new AModal(option={}, config)
+	# 	Params:
+	# 		options: 		# => Json object
+	# 			id:			# => The id/name of the modal
+	# 			elm:		# => The dom element
+	# 			type:		# => String [link|html]
+	# 			status:		# => Is it hidden or visible?
+	# 
+	# 		config:			# => Should come from the modal manager
+	constructor: (options={}, @config)->
+		{@elm, @id, @type, @status} = options
+		@status ||= constants.popup_statuses.hidden
+		@attached_events =
+			"onOpen":			 []
+			"onClose":			 []
+		manipulateDom @
+	
+	# + Opens a popup changing its status and updating the dom
+	open: ()->
+		@fire "onOpen" if @status == constants.popup_statuses.hidden
+		@status = constants.popup_statuses.active
+		manipulateDom @
+
+	# + Closes a popup changing its status and updating the dom
+	close: ()->
+		@fire "onClose" if @status == constants.popup_statuses.active
+		@status = constants.popup_statuses.hidden
+		manipulateDom @
+
+	# + Attach an event to the modal
+	on: (event_name, handler)->
+		event_name = event_name.toLowerCase()
+		event_name = event_name.charAt(0).toUpperCase() + event_name.substring(1);
+		event_name = "on#{event_name}"
+
+		@attached_events[event_name].push handler
+
+	fire: (event_name)->
+		for event in @attached_events[event_name]
+			event(@)
+
+	clearEvent: (event_name)->
+		@attached_events[event_name] = []
+
+
+# ==================================================================
+
+
+
+
+
+
+# The provider to save templates
+angularModal = angular.module(angular_modal_module_name, []).provider('$modalTemplates', [->
 
 	available_templates = {
 		default: "
@@ -48,9 +132,18 @@ modal = angular.module('angular.modal', []).provider('$modalTemplates', [->
 ])
 
 
-# Use the provider $modalProvider to .push popups and be sure to use this structure:
 
-modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
+
+
+
+
+# Use the provider $modalProvider to .push popups and be sure to use this structure:
+# 	id:			# => The id/name of the modal
+# 	elm:		# => The dom element
+# 	type:		# => String [link|html]
+# 	status:		# => Is it hidden or visible?
+
+angularModal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 	
 	# All available popup statuses
 	popup_statuses =
@@ -66,66 +159,28 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 	# The object with all the modals. Initialized empty
 	available_modals = {}
 
+	# Internal logging method. It will print # angular.modal => [your message here]
+	@log = (message, method='log')->
+		console[method]("# angular.modal => ", message)
+
+	# Private method to set a modal in the main object and return it
+	set = (modal)->
+		available_modals[modal.id] = modal
+
 	# Get the current template
 	@current_template = ->
 		$modalTemplatesProvider.getTemplate $modalTemplatesProvider.current_template
 
-	# DOM Manipulation methods ===================================================
-
-	# - Generate an univoke id and give it to the element then return the id
-	generateId = (elm)->
-		date	= new Date()
-		milli	= date.getMilliseconds()
-		rand	= Math.random().toString().replace("0.", "")
-		# Using only value of caused some issues - Duplicated ids
-		stamp	= "#{date.valueOf()}#{milli}#{rand}"
-
-		# the final id
-		id 		= "#{config.dom_id_prefix}#{stamp}#{milli}"
-
-		elm.attr('id', id)
-
-		id
-
-	# - Manage the dom related stuff of the element
-	manipulateDom = (popup)->
-		raw = document.getElementById(popup.elm_id) # Let's avoid jquery
-		elm = angular.element(raw) # Get that element
-
-		elm.addClass(config.dom_class)
-
-		if popup.status == popup_statuses.active
-			elm.addClass config.dom_active_class
-		else
-			elm.removeClass config.dom_active_class
-
-	#  ============================================================================
-
-
-
-	# Data manipulation methods ===================================================
-
-	# TODO: We need a class for our modals in order to use them wisely
-
-	# - Push a popup into the main object available_modals
+	# + Push a popup into the main object available_modals
 	@push = (popup={})->
-		if popup.type == "html"
-			available_modals[popup.id] = {}
-			available_modals[popup.id].type 	= popup.type
-			available_modals[popup.id].id 		= popup.id
-			available_modals[popup.id].elm_id	= generateId(popup.elm)
-			available_modals[popup.id].status 	= popup_statuses.hidden
+		# Assign to a variable
+		newpopup = set(new AModal(popup, config))
+		event_handler.refreshEvents()
+		newpopup
 
-			manipulateDom(available_modals[popup.id])
-		else if popup.type == "link"
-			available_modals[popup.id] = {}
-			available_modals[popup.id].type 	= popup.type
-			available_modals[popup.id].id 		= popup.id
-			available_modals[popup.id].elm_id	= generateId(popup.elm)
-			available_modals[popup.id].status 	= popup_statuses.hidden
-
-			manipulateDom(available_modals[popup.id])
-			#alert "fill here"
+	# + A public method to retreive a modal
+	@get = (id)->
+		available_modals[id]
 
 	#  ============================================================================
 
@@ -142,67 +197,52 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 
 	# Event handler ===============================================================
 
-	available_events = 
-		modalWillAppear: "modalWillAppear"
-		modalDidAppear: "modalDidAppear"
-		modalWillDisappear: "modalWillDisappear"
-		modalDidDisappear: "modalDidDisappear"
+	modal_provider_object = @
 
-	ModalEventHandler = ->
-		registered_events = {}
+	class EventHandler
+		events_to_attach = []
 
-		@register = (event, callback)->
-			unless registered_events[event] instanceof Array
-				registered_events[event] = []
+		constructor: ->
+		register: (modal_id, event_name, handler)->
+			events_to_attach.push {modal_id: modal_id, event_name: event_name, handler: handler}
+			@refreshEvents()
+		refreshEvents: ->
+			for event in events_to_attach when event
+				modal = modal_provider_object.get(event.modal_id)
+				if modal
+					modal.on(event.event_name, event.handler) if modal
+					events_to_attach.splice(_i, 1)
+			events_to_attach
 
-			registered_events[event].push callback
+	event_handler = new EventHandler()
 
-			true
-
-		@call = (event)->
-			if callbacks = registered_events[event]
-				for callback in callbacks
-					callback() # call the function - pass in something?
-
-			true
-
-	eventHandler = new ModalEventHandler()
+	# + Universal method to 
+	@attachEventTo = (modal_id, event_name, handler)-> 
+		event_handler.register(modal_id, event_name, handler)
 
 	#  ============================================================================
 
 	# FACTORY: $modal
 	@$get = ['$timeout', ($timeout)->
 
+		# 
 		@closeAll = ->
-
 			for modal_id of available_modals
 				modal = available_modals[modal_id]
-				console.log modal
-				modal.status = popup_statuses.hidden
-				manipulateDom(modal)
+				modal.close()
 
 		@open = (id)->
 			@closeAll()
 
-			# eventHandler.call available_events.modalWillAppear
+			if available_modals[id] == undefined
+				@log "Angular.modal: There is no popup with id #{id}","warn"
+			else
+				$timeout(->
+						available_modals[id].open()
+				, 300)
 
-			$timeout(->
-
-				if available_modals[id] == undefined
-					console.warn "Angular.modal: There is no popup with id #{id}"
-				else
-					available_modals[id].status = popup_statuses.active
-					manipulateDom(available_modals[id])
-
-				# eventHandler.call available_events.modalDidAppear
-				
-			, 300)
-
-		# $modal.isOpened(<modal_id>) => true/false if the modal with the given id is/isn't opened
 		@isOpened = (id)->
 			available_modals[id].status == popup_statuses.active unless available_modals[id] == undefined
-
-		# @on = (event, callback)-> eventHandler.register(event, callback)
 
 		@
 	]
@@ -213,15 +253,12 @@ modal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProvider)->
 
 # + The directive to register a modal - Data stuff
 # 	Register a normal inline modal through HTML
-modal.directive("modalize", ['$modal', ($modal)->
+angularModal.directive("modalize", ['$modal', ($modal)->
 	restrict: "A"
 	link: (scope, elm, attr)->
 
 		modal_id = attr.modalize
 		type = "html"
-
-		console.log modal_id
-		console.log elm
 
 		$modal.push({type: type, id: modal_id, elm: elm})
 
@@ -230,7 +267,7 @@ modal.directive("modalize", ['$modal', ($modal)->
 
 # + The directive to register a modal - Data stuff
 # 	Register a dynamic modal through HTML declaration
-modal.directive("modalizeD", ['$modal', ($modal)->
+angularModal.directive("modalizeD", ['$modal', ($modal)->
 	restrict: "A"
 	scope:
 		src: "@"
@@ -270,7 +307,7 @@ modal.directive("modalizeD", ['$modal', ($modal)->
 
 # + The directive to generate the basic layout of a modal - Graphic stuff
 # 	It helps devs to have a repeatable pattern when building a modal.
-modal.directive("modalize", ['$modal', ($modal)->
+angularModal.directive("modalize", ['$modal', ($modal)->
 	restrict: "E"
 	scope: 
 		windowClass:	"@"
@@ -288,7 +325,7 @@ modal.directive("modalize", ['$modal', ($modal)->
 
 # + Adapt to the parent container
 # 	This is an utility directive created just for this occasion. It makes some div adapt and position to its parent.
-modal.directive("adaptToParent", ['$timeout', ($timeout)->
+angularModal.directive("adaptToParent", ['$timeout', ($timeout)->
 	restrict: "A"
 	link: (scope, elm, attr)->
 
@@ -312,7 +349,6 @@ modal.directive("adaptToParent", ['$timeout', ($timeout)->
 					elm[0].style.height = height
 					elm[0].style.width = width
 			else
-				console.log "Clear interval"
 				window.clearInterval time
 
 		, 100)
@@ -323,10 +359,9 @@ modal.directive("adaptToParent", ['$timeout', ($timeout)->
 
 
 # Default configuration of the module
-modal.run(['$modal', '$modalTemplates', '$rootScope', ($modal, $modalTemplates, $rootScope)->
+angularModal.run(['$modal', '$modalTemplates', '$rootScope', ($modal, $modalTemplates, $rootScope)->
 
 	if $modal.configGet('inject_into_html')
 		$rootScope.$modal = $modal
 		window.$modal = $modal
-
 ])
