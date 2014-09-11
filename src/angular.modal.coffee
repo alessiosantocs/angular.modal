@@ -225,26 +225,34 @@ angularModal.provider('$modal', ['$modalTemplatesProvider', ($modalTemplatesProv
 	# FACTORY: $modal
 	@$get = ['$timeout', ($timeout)->
 
-		# 
-		@closeAll = ->
+		$modal = @
+
+		$modal.closeAll = ->
 			for modal_id of available_modals
 				modal = available_modals[modal_id]
 				modal.close()
 
-		@open = (id)->
-			@closeAll()
+		$modal.open = (id, doNotLoop=false)->
+			$modal.closeAll()
 
 			if available_modals[id] == undefined
-				@log "Angular.modal: There is no popup with id #{id}","warn"
+				$modal.log "There is no popup with id #{id}","warn"
+
+				unless doNotLoop
+					$timeout(->
+						$modal.log "Trying a second time... Opening #{id}"
+						$modal.open(id, true)
+					, 300)
+
 			else
 				$timeout(->
-						available_modals[id].open()
+					available_modals[id].open()
 				, 300)
 
-		@isOpened = (id)->
+		$modal.isOpened = (id)->
 			available_modals[id].status == popup_statuses.active unless available_modals[id] == undefined
 
-		@
+		$modal
 	]
 
 	@

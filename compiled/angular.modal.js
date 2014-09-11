@@ -191,7 +191,9 @@
       };
       this.$get = [
         '$timeout', function($timeout) {
-          this.closeAll = function() {
+          var $modal;
+          $modal = this;
+          $modal.closeAll = function() {
             var modal, modal_id, _results;
             _results = [];
             for (modal_id in available_modals) {
@@ -200,22 +202,31 @@
             }
             return _results;
           };
-          this.open = function(id) {
-            this.closeAll();
+          $modal.open = function(id, doNotLoop) {
+            if (doNotLoop == null) {
+              doNotLoop = false;
+            }
+            $modal.closeAll();
             if (available_modals[id] === void 0) {
-              return this.log("Angular.modal: There is no popup with id " + id, "warn");
+              $modal.log("There is no popup with id " + id, "warn");
+              if (!doNotLoop) {
+                return $timeout(function() {
+                  $modal.log("Trying a second time... Opening " + id);
+                  return $modal.open(id, true);
+                }, 300);
+              }
             } else {
               return $timeout(function() {
                 return available_modals[id].open();
               }, 300);
             }
           };
-          this.isOpened = function(id) {
+          $modal.isOpened = function(id) {
             if (available_modals[id] !== void 0) {
               return available_modals[id].status === popup_statuses.active;
             }
           };
-          return this;
+          return $modal;
         }
       ];
       return this;
